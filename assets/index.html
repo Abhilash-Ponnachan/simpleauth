@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>AuthSimple</title>
+        <link rel="stylesheet" href="styles/style.css">
+    </head>
+    <body>
+        <form id="form-login" action="/submit" method="post">
+            <div id="dialog-login">
+                <label class="labels">User Name:</label> 
+                <input class="text-boxes" type="text" id="val-username" name="username" required>
+                <label class="labels">Password:</label>
+                <input class="text-boxes" type="password" id="val-password" name="password" required>
+                <div></div>
+                <div  class="action-container">
+                    <input type="submit" class="action-buttons" id="btn-submit" name="login" value="Login">
+                    <input type="submit" class="action-buttons" id="btn-cancel" name="cancel" value="Cancel" formnovalidate>
+                </div>
+            </div>
+        </form>
+    </body>
+</html>

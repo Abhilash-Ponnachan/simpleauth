@@ -1,0 +1,63 @@
+  html,
+  body {
+      margin:0;
+      padding:0;
+      height:100%;
+      background-color:rgba(186, 209, 209, 0.75);
+  }
+  
+  #dialog-login {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    border: 3px solid rgba(112, 164, 199, 0.746);
+    box-shadow: 2px 2px 2px 2px rgb(169, 181, 246);
+    border-radius: 10px;
+    z-index: 10;
+    background: rgba(177, 205, 238, 0.45);
+    width: 50%;
+    max-width: 50%;
+    height: 20%;
+    max-height: 20%;
+    display: grid;
+    padding: 10px;
+    grid-template-columns: 30% 70%;
+    grid-row-gap: 10px;
+    grid-template-rows: auto;
+  }
+
+ .labels{
+   align-self: center;
+   padding-left: 30%;
+ }
+
+ .text-boxes{
+   align-self: center;
+   height: 40%;
+   width: 60%;
+ }
+
+.action-container{
+  display: flex;
+  justify-self: center;
+  width: 100%
+}
+
+.action-buttons{
+  justify-self: center;
+  margin-right: 15%;
+  margin-bottom: 2%;
+  width: 90%;
+  height: 60%;
+  align-self: center;
+  font-size: 0.9vw;
+}
+
+#btn-submit{
+  color: green;
+}
+
+#btn-cancel{
+  color: red;
+}
