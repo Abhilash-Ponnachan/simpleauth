@@ -1,5 +1,7 @@
 {
     "port": "8585",
     "defaultPage": "index.html",
-    "assetsDir": "./assets"
+    "assetsDir": "./assets",
+    "usersDb": "./db/users.json",
+    "redirectURL": "http://localhost:9090"
 }

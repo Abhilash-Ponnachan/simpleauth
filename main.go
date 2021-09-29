@@ -50,7 +50,13 @@ func main() {
 	// decorate default FS object to restric dir access
 	fs := http.FileServer(restrictedFS{http.Dir(config().AssetsDir)})
 	// struct to encapsulate handler methods
-	rh := reqHandler{filehandler: fs}
+	// initialize with helpers
+	rh := reqHandler{
+		filehandler: fs,
+		userRepo:    &userRepoFile{},
+	}
+	rh.init()
+	defer rh.finalize()
 
 	// handle base path
 	muxHandler.HandleFunc("/", rh.checkAndServeFile)

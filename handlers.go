@@ -4,12 +4,32 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 )
 
 // handler funcs for diff req
 type reqHandler struct {
 	filehandler http.Handler
+	userRepo    userRepo
+	session     *session
+	failures    *attempts
+}
+
+func (rh *reqHandler) init() {
+	if rh.userRepo != nil {
+		rh.userRepo.init()
+	}
+	rh.session = &session{}
+	rh.session.init()
+	rh.failures = &attempts{}
+	rh.failures.init()
+}
+
+func (rh *reqHandler) finalize() {
+	if rh.userRepo != nil {
+		rh.userRepo.close()
+	}
 }
 
 // handler func for /hello[?name=xxx]
@@ -48,6 +68,7 @@ func (rh *reqHandler) checkAndServeFile(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	// check if existing session cookie
 	// serve file
 	rh.filehandler.ServeHTTP(w, r)
 }
@@ -60,8 +81,34 @@ func (rh *reqHandler) submit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.ParseForm()
-	for k, v := range r.Form {
-		fmt.Printf("key: %v ==> value: %v\n", k, v)
+	rdURL := config().RedirectURL
+	// check if it was Login OR Cancel action
+	if loginAction(r.Form) {
+		// check if username & password valid
+		username := r.Form.Get("username")
+		password := r.Form.Get("password")
+		if rh.userRepo.validateUser(username, password) {
+			// generate login session cookie
+			// redirect with auth code to redirect url
+			ac := rh.session.createAuthCode(username)
+			rdURL = fmt.Sprintf("%s?code=%s", rdURL, ac)
+			//log.Printf("Success; authcode = %s\n", ac)
+		} else {
+			// if N reattempts failed redirect
+			// back to redirect url with afilure code
+			// else redirect back to login for N attempts
+			rdURL = r.Header.Get("Origin")
+		}
 	}
-	http.Redirect(w, r, "https://google.com", 302)
+	// handle Cancel
+	// redirect back to 'redirect url'
+	http.Redirect(w, r, rdURL, 302)
+}
+
+func loginAction(form url.Values) bool {
+	isLoginAction := false
+	if form.Get("login") != "" {
+		isLoginAction = true
+	}
+	return isLoginAction
 }

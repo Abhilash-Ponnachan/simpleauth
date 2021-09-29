@@ -14,6 +14,8 @@ type configData struct {
 	Port        string
 	DefaultPage string
 	AssetsDir   string
+	UsersDb     string
+	RedirectURL string
 }
 
 var once sync.Once
