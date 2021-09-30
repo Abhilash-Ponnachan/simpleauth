@@ -62,6 +62,8 @@ func main() {
 	muxHandler.HandleFunc("/", rh.checkAndServeFile)
 	// handle /login POST
 	muxHandler.HandleFunc("/submit", rh.submit)
+	// handle POST api for token
+	muxHandler.HandleFunc("/api/token", rh.token)
 
 	// dummy api for testing html response
 	muxHandler.HandleFunc("/api/hello", rh.hello)

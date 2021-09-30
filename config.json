@@ -3,5 +3,7 @@
     "defaultPage": "index.html",
     "assetsDir": "./assets",
     "usersDb": "./db/users.json",
-    "redirectURL": "http://localhost:9090"
+    "redirectURL": "http://localhost:9090",
+    "numFailedAttempts": 3,
+    "failedTimeout": 1
 }

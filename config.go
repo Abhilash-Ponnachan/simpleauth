@@ -11,11 +11,13 @@ const configFile = "./config.json"
 const portEnvKey = "PORT"
 
 type configData struct {
-	Port        string
-	DefaultPage string
-	AssetsDir   string
-	UsersDb     string
-	RedirectURL string
+	Port              string
+	DefaultPage       string
+	AssetsDir         string
+	UsersDb           string
+	RedirectURL       string
+	NumFailedAttempts uint
+	FailedTimeout     uint
 }
 
 var once sync.Once

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -90,19 +91,65 @@ func (rh *reqHandler) submit(w http.ResponseWriter, r *http.Request) {
 		if rh.userRepo.validateUser(username, password) {
 			// generate login session cookie
 			// redirect with auth code to redirect url
-			ac := rh.session.createAuthCode(username)
+			ac := rh.session.authenticate(username)
 			rdURL = fmt.Sprintf("%s?code=%s", rdURL, ac)
 			//log.Printf("Success; authcode = %s\n", ac)
 		} else {
 			// if N reattempts failed redirect
 			// back to redirect url with afilure code
 			// else redirect back to login for N attempts
-			rdURL = r.Header.Get("Origin")
+			a := rh.failures.allowed(username)
+			if a {
+				// if allowed reattempt
+				// redirect to login home
+				rdURL = r.Header.Get("Origin")
+			}
 		}
 	}
 	// handle Cancel
 	// redirect back to 'redirect url'
-	http.Redirect(w, r, rdURL, 302)
+	http.Redirect(w, r, rdURL, http.StatusTemporaryRedirect)
+}
+
+// handler for getting token
+func (rh *reqHandler) token(w http.ResponseWriter, r *http.Request) {
+	// handle only POST
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	// placeholder token requst body
+	tr := struct {
+		Code string
+	}{
+		"",
+	}
+	// Try to decode the request body into the struct. If there is an error,
+	// respond to the client with the error message and a 400 status code.
+	err := json.NewDecoder(r.Body).Decode(&tr)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	log.Printf("Req. for Token = %v\n", tr.Code)
+	// decode tr.code (authcode)
+	// extract username and timestamp
+	// check in session
+	// if valid login session gen id-token
+	// set id-token
+	// send reponse back with id-token
+	// rsp := struct {
+	// 	IdToken string
+	// }{
+	// 	token,
+	// }
+	// js, err := json.Marshal(rsp)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
+	// w.Header().Set("Content-Type", "application/json")
+	// w.Write(js)
 }
 
 func loginAction(form url.Values) bool {
