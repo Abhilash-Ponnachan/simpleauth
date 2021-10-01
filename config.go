@@ -18,6 +18,7 @@ type configData struct {
 	RedirectURL       string
 	NumFailedAttempts uint
 	FailedTimeout     uint
+	CodeValiditySecs  uint
 }
 
 var once sync.Once

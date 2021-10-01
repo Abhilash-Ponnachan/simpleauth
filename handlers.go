@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -131,25 +130,12 @@ func (rh *reqHandler) token(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	log.Printf("Req. for Token = %v\n", tr.Code)
-	// decode tr.code (authcode)
-	// extract username and timestamp
-	// check in session
-	// if valid login session gen id-token
-	// set id-token
-	// send reponse back with id-token
-	// rsp := struct {
-	// 	IdToken string
-	// }{
-	// 	token,
-	// }
-	// js, err := json.Marshal(rsp)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-	// w.Header().Set("Content-Type", "application/json")
-	// w.Write(js)
+	ok, tkn := rh.session.tryGetToken(tr.Code)
+	if !ok {
+		http.Error(w, "Error generating token!", http.StatusBadRequest)
+		return
+	}
+	w.Write([]byte(tkn))
 }
 
 func loginAction(form url.Values) bool {

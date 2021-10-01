@@ -5,5 +5,8 @@
     "usersDb": "./db/users.json",
     "redirectURL": "http://localhost:9090",
     "numFailedAttempts": 3,
-    "failedTimeout": 1
+    "failedTimeout": 1,
+	"codeValiditySecs": 30
+    
+
 }
