@@ -81,7 +81,7 @@ func (rh *reqHandler) submit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.ParseForm()
-	rdURL := config().RedirectURL
+	rdURL := config().redirectURL
 	// check if it was Login OR Cancel action
 	if loginAction(r.Form) {
 		// check if username & password valid
