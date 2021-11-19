@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -81,7 +82,7 @@ func (rh *reqHandler) submit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.ParseForm()
-	rdURL := config().redirectURL
+	rdURL := getRedirectURL(r)
 	// check if it was Login OR Cancel action
 	if loginAction(r.Form) {
 		// check if username & password valid
@@ -95,7 +96,7 @@ func (rh *reqHandler) submit(w http.ResponseWriter, r *http.Request) {
 			//log.Printf("Success; authcode = %s\n", ac)
 		} else {
 			// if N reattempts failed redirect
-			// back to redirect url with afilure code
+			// back to redirect url with a filure code
 			// else redirect back to login for N attempts
 			a := rh.failures.allowed(username)
 			if a {
@@ -107,6 +108,7 @@ func (rh *reqHandler) submit(w http.ResponseWriter, r *http.Request) {
 	}
 	// handle Cancel
 	// redirect back to 'redirect url'
+	log.Printf("Redirect Back to => %s\n", rdURL)
 	http.Redirect(w, r, rdURL, http.StatusTemporaryRedirect)
 }
 
@@ -136,6 +138,29 @@ func (rh *reqHandler) token(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write([]byte(tkn))
+}
+
+func getRedirectURL(r *http.Request) string {
+	// Req Header 'Referer'will hae=ve 'return'
+	//  as part of Query String
+	//  Try to extract that
+	// Referer:[http://localhost:8585/?return=localhost:9090]
+	rfr := r.Header.Get("Referer")
+	if rfr != "" {
+		u, err := url.Parse(rfr)
+		if err == nil {
+			m, _ := url.ParseQuery(u.RawQuery)
+			rt := m["return"]
+			if len(rt) == 1 {
+				rd := fmt.Sprintf("http://%s", rt[0])
+				log.Printf("Referer.return = %s\n", rd)
+				return rd
+			}
+		}
+	}
+	// if reached here
+	//  return redirect url from config
+	return config().redirectURL
 }
 
 func loginAction(form url.Values) bool {
